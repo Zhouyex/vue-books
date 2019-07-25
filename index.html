@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>图书管理</title>
+    <style>
+        #app{
+            margin: auto;
+            width: 1000px;
+        }
+        .table th, .table td {
+            text-align: center;
+            vertical-align: middle!important;
+        }
+        .on{
+            background-color: red;
+        }
+
+        .table tr:nth-child(even) td:last-child button{
+            background-color: #d9534f;
+            border: #d9534f;
+        }
+
+
+    </style>
+    <link rel="stylesheet" href="./static/bootstrap.css">
+    <script src="./static/vue.js"></script>
+</head>
+<body>
+    <div id="app">
+        <h1>图书管理</h1><br>
+        <!-- 列表 -->
+        <table class="table" style="text-align:center">
+
+            <tr>
+                <th style="text-align:center">序号</th>
+                <th>书名</th>
+                <th>作者</th>
+                <th>数量</th>
+                <th>总价</th>
+                <th>操作</th>
+            </tr>
+            <!-- <tr>
+                <td>0</td>
+                <td>红楼梦</td>
+                <td>曹雪芹</td>
+                <td>
+                    <button type="button" class="btn btn-primary">+</button>
+                    1
+                    <button type="button" class="btn btn-primary">-</button>
+                </td>
+                <td>100</td>
+                <td>
+                    <button type="button" class="btn btn-success">删除</button>
+                </td>
+            </tr>  
+
+            <tr>
+                <td>0</td>
+                <td>红楼梦</td>
+                <td>曹雪芹</td>
+                <td>
+                    <button type="button" class="btn btn-primary">+</button>
+                    1
+                    <button type="button" class="btn btn-primary">-</button>
+                </td>
+                <td>100</td>
+                <td>
+                    <button type="button" class="btn btn-success">删除</button>
+                </td>
+            </tr>   -->
+
+
+            <tr v-for="(item,index) of bookarr">
+                <td>{{index}}</td>
+                <td>{{item.obookname}}</td>
+                <td>{{item.oauthor}}</td>
+                <td>
+                    <button type="button" class="btn btn-primary" @click="addnum(index)">+</button>
+                    {{item.onumber}}
+                    <button type="button" class="btn btn-primary" @click="lessnum(index)">-</button>
+                </td>
+                <!-- <td style="display: none">
+                    {{item.singleprice}}
+                </td> -->
+                <td>{{item.oprice}}</td>
+
+                <!--TODO ======= 颜色可以根据index 来进行class的添加 -->
+                <td>
+                    <button type="button" class="btn btn-success" @click="remove(index)" >删除</button>
+                </td> 
+            </tr>
+
+            <tr>
+                    <td colspan="6" style="text-align: right">
+                        <h2>
+                           总价：￥{{totalprice}}
+                        </h2>
+                        
+                    </td>
+                </tr>
+    
+
+        </table>
+
+
+        <!-- ==============================添加============================================== -->
+        <h3>添加书籍</h3>
+
+       
+        <label for="bookname">书名:</label>
+        <input type="text" class="form-control" id="bookname" v-model='bookname'>
+
+        <label for="bookname">作者:</label>
+        <input type="text" class="form-control" id="bookname" v-model='author'>
+
+        <label for="bookname">单价:</label>
+        <input type="text" class="form-control" id="bookname" v-model='price'>
+
+        <label for="bookname">数量:</label>
+        <input type="text" class="form-control" id="bookname" v-model='number'>
+
+        <!--TODO======= 自定义组件 -->
+        <!-- <inp inpval="bookname"></inp> -->
+
+
+        <br>
+        <button type="button" class="btn btn-primary btn-lg btn-block" @click="add">添加</button>
+    </div>
+
+    <script>
+        // Vue.component('inp',{
+        //     props:['inpval'],
+        //     template:`<div>
+        //               <label for="book">书名:</label>
+        //               <input type="text" class="form-control" id="book" v-model="????">
+        //               </div>
+        //               `
+
+        // });
+
+      let app =  new Vue({
+            el:'#app',
+            data:{
+                flag:true,
+                bookname:'',
+                author:'',
+                price:null,
+                number:null,
+                singleprice:0,
+                totalprice:0,
+                // 存放总价
+                setallprice:[],
+                bookarr:[{obookname:'out of time',oauthor:'Silly',oprice:10,onumber:2,osingleprice:5},
+                         {obookname:'三千世界',oauthor:'Stark',oprice:20,onumber:2,osingleprice:10}
+                         
+                        ]
+
+            },
+            methods:{
+                 // 计算总价
+               
+                //添加
+                add()
+                {  
+                    let rec = /^\d*$/; 
+                    // 进行表单验证
+                    if(this.bookname==='' && this.author==='' && this.price==='' && this.number==='')
+                    {
+                        alert("信息不完整")
+                        return
+                        
+                    }else if( rec.test(this.price) == true && rec.test(this.number) == true){
+                             // console.log(1);
+                            let obj = {};
+                            obj.obookname = this.bookname;
+                            obj.oauthor = this.author;
+                            obj.oprice = this.price * this.number;
+                            obj.onumber = this.number;
+                            obj.osingleprice = this.price;
+
+                            this.bookarr.push(obj);
+                            // console.log(this.bookarr)
+
+                            // 计算总价
+                            let ap = [];
+                            for(let i=0;i<this.bookarr.length;i++)
+                            {
+                                ap.push(this.bookarr[i].oprice)
+                            }
+                            // console.log(this.setallprice);
+
+                            this.totalprice = ap.reduce(function(a,b){
+                                return a+b;
+                            },0)
+
+                    }else{
+                        alert("单价或数量 填写格式不对")
+                        return
+                        // console.log(1)
+                    }
+
+
+                   
+
+
+
+                },
+                remove(index)
+                {
+                    this.bookarr.splice(index,1);
+
+                    let jj = [];
+                    for(let i=0;i<this.bookarr.length;i++)
+                    {
+                        jj.push(this.bookarr[i].oprice)
+                    }
+                    // console.log(this.setallprice);
+                    this.totalprice = jj.reduce(function(a,b){
+                        return a+b;
+                    },0)
+                },
+
+                addnum(index)
+                {
+                    // console.log('+');
+                    // console.log(index);
+                    let startaddnum = this.bookarr[index].onumber;
+                    let foraddnum = this.bookarr[index].onumber++;
+                    // console.log(foraddnum);
+
+                    // if(foraddnum>startaddnum)
+                    // {
+                    //     alert('没这么多存货了哥')
+                    //     return;
+                    // }
+                    // console.log(foraddnum)
+
+                     // 计算总价
+                   
+                
+                    // 更新这一行的总价
+                    this.bookarr[index].oprice = this.bookarr[index].oprice + parseInt(this.bookarr[index].osingleprice)
+                    
+                    // 更新总价
+                    // this.totalprice =1000;
+                    let jj = [];
+                    for(let i=0;i<this.bookarr.length;i++)
+                    {
+                        jj.push(this.bookarr[i].oprice)
+                    }
+                    // console.log(this.setallprice);
+                    this.totalprice = jj.reduce(function(a,b){
+                        return a+b;
+                    },0)
+
+
+                   
+                },
+
+                lessnum(index)
+                {   
+                    // 数量
+                    let startnum = this.bookarr[index].onumber;
+                    // console.log(startnum,11111);
+
+                    // console.log('-')
+                    // console.log(index);
+                    let forlessnum = this.bookarr[index].onumber--;
+
+                    if(forlessnum <= 0 )
+                    {
+                        alert('别小于0啊哥');
+
+                        this.bookarr[index].onumber =0;
+                        
+                        return
+                    }
+                    // console.log(forlessnum);
+
+
+                    // 调用计算总价函数
+                    // this.$options.methods.countprice();
+
+                     // 计算总价
+                    this.bookarr[index].oprice = this.bookarr[index].oprice - parseInt(this.bookarr[index].osingleprice)
+                    let jj = [];
+                    for(let i=0;i<this.bookarr.length;i++)
+                    {
+                        jj.push(this.bookarr[i].oprice)
+                    }
+                    // console.log(this.setallprice);
+                    this.totalprice = jj.reduce(function(a,b){
+                        return a+b;
+                    },0)
+                    
+
+                    
+                }
+
+               
+
+
+            },
+            computed:{
+                btncolor()
+                {
+                    return  true;
+                }
+ 
+            },
+            // 计算原有的写死的价格 页面加载进来就渲染
+            mounted(){
+                // console.log(index);
+
+                for(let i=0;i<this.bookarr.length;i++)
+                {
+                    this.setallprice.push(this.bookarr[i].oprice)
+                }
+                console.log(this.setallprice);
+
+                this.totalprice = this.setallprice.reduce(function(a,b){
+                    return a+b;
+                },0)
+
+               
+            }
+
+
+        })
+    
+    </script>
+</body>
+</html>
